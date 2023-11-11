@@ -1,1 +1,96 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+const int trigPin = A2;
+const int echoPin = A1;
+const int redLedPin = 11;
+const int yellowLedPin = 12;
+const int greenLedPin = 13;
+const int buzzerPin = 7;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(redLedPin, OUTPUT);
+  pinMode(yellowLedPin, OUTPUT);
+  pinMode(greenLedPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+
+  lcd.init();
+  lcd.backlight();
+}
+
+void loop() {
+  long duration, distance;
+
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+
+  distance = duration / 58.2;
+
+  lcd.setCursor(0,0);
+  lcd.print("Distance: ");
+  lcd.print(distance);
+  
+  if (distance <= 10) {
+    digitalWrite(redLedPin, HIGH);
+    digitalWrite(yellowLedPin, LOW);
+    digitalWrite(greenLedPin, LOW);
+    
+    
+    noTone(buzzerPin);
+    delay(1000);
+    
+    lcd.setCursor(0,1);
+    lcd.print("RED ALERT!");
+    
+    delay(500); 
+    lcd.clear();
+    
+    } else if (distance >10 && distance <=20) {
+      digitalWrite(redLedPin, LOW);
+      digitalWrite(yellowLedPin, HIGH);
+      digitalWrite(greenLedPin, LOW); 
+      
+      
+      noTone(buzzerPin); 
+      delay(500); 
+      
+      lcd.setCursor(0,1); 
+      lcd.print("CAUTION!"); 
+      
+      delay(500); 
+      lcd.clear(); 
+      
+    } else if (distance >20 && distance <=30) {
+      digitalWrite(redLedPin, LOW); 
+      digitalWrite(yellowLedPin, LOW); 
+      digitalWrite(greenLedPin,HIGH); 
+      tone(buzzerPin);
+      lcd.setCursor(0,1); 
+      lcd.print("SAFE"); 
+      
+      delay(500); 
+      lcd.clear(); 
+      
+    } else {
+      digitalWrite(redLedPin, LOW); 
+      digitalWrite(yellowLedPin, LOW); 
+      digitalWrite(greenLedPin,HIGH); 
+      tone(buzzerPin, 1000);
+      
+      lcd.setCursor(0,1); 
+      lcd.print("OUT OF RANGE"); 
+      
+      delay(500); 
+      lcd.clear();  
+    }
+}
